@@ -1,1 +1,38 @@
+# Colócalo en tu repo en:  .github/workflows/sync_mundial.yml
+name: Sync Mundial → Firestore
 
+on:
+  schedule:
+    # ¡OJO! GitHub Actions usa SIEMPRE UTC. Monterrey es UTC-6 (sin horario de verano).
+    # Estos 3 horarios buscan ejecutarse al cierre de cada bloque de partidos:
+    - cron: '0 0 * * *' #  18:00 Monterrey — tras el bloque del mediodía
+    - cron: '0 4 * * *' #  22:00 Monterrey — tras el bloque de la tarde
+    - cron: '0 7 * * *' #  01:00 Monterrey — tras el bloque de la noche
+  # Permite dispararlo manualmente desde la pestaña Actions
+  workflow_dispatch: {}
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar dependencias
+        run: npm install firebase-admin axios
+
+      - name: Ejecutar sincronización
+        env:
+          # --- Secrets (obligatorios) ---
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          # --- Variables del repo (opcionales: si no existen, el script usa sus defaults) ---
+          LEAGUE_ID: ${{ vars.LEAGUE_ID }}
+          SEASON: ${{ vars.SEASON }}
+          GRUPOS: ${{ vars.GRUPOS }}
+        run: node update_fixtures.js
