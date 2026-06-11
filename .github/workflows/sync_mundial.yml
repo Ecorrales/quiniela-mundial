@@ -29,10 +29,10 @@ jobs:
       - name: Ejecutar sincronización
         env:
           # --- Secrets (obligatorios) ---
-          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+          FOOTBALL_DATA_TOKEN: ${{ secrets.FOOTBALL_DATA_TOKEN }}
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           # --- Variables del repo (opcionales: si no existen, el script usa sus defaults) ---
-          LEAGUE_ID: ${{ vars.LEAGUE_ID }}
-          SEASON: ${{ vars.SEASON }}
+          COMPETITION: ${{ vars.COMPETITION }}
           GRUPOS: ${{ vars.GRUPOS }}
+          SEASON: ${{ vars.SEASON }}
         run: node update_fixtures.js
