@@ -51,16 +51,21 @@
     .pulse span { font-family: var(--mono); font-size: 10px; color: var(--cal-dim); text-transform: uppercase; letter-spacing: 0.08em; }
     @keyframes ping { 0% { box-shadow: 0 0 0 0 rgba(63,203,116,0.5); } 70% { box-shadow: 0 0 0 7px rgba(63,203,116,0); } 100% { box-shadow: 0 0 0 0 rgba(63,203,116,0); } }
 
-    /* Leaderboard de personas */
+    /* Lista de personas (acordeón) */
     .lb { margin-top: 20px; display: flex; flex-direction: column; gap: 9px; }
-    .lb-row {
-      display: grid; grid-template-columns: 26px 1fr auto; align-items: center; gap: 13px;
-      width: 100%; text-align: left; cursor: pointer; font-family: var(--display); color: var(--cal);
-      padding: 13px 15px; border: 1px solid var(--linea); border-radius: 15px;
+    .person {
+      border: 1px solid var(--linea); border-radius: 15px; overflow: hidden;
       background: linear-gradient(180deg, rgba(242,245,239,0.04), rgba(0,0,0,0.10));
-      transition: border-color .15s, background .15s;
+      transition: border-color .15s;
     }
-    .lb-row.active { border-color: var(--foco); background: linear-gradient(180deg, rgba(245,184,46,0.10), rgba(0,0,0,0.10)); }
+    .person.active { border-color: var(--foco); }
+    .lb-row {
+      display: grid; grid-template-columns: 26px 1fr auto 16px; align-items: center; gap: 13px;
+      width: 100%; text-align: left; cursor: pointer; font-family: var(--display); color: var(--cal);
+      padding: 13px 15px; background: transparent; border: none;
+    }
+    .person.active .lb-row { background: linear-gradient(180deg, rgba(245,184,46,0.10), rgba(0,0,0,0.05)); }
+    .lb-row:focus-visible { outline: 2px solid var(--foco); outline-offset: -2px; }
     .lb-row .seed { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--cal-faint); text-align: center; }
     .lb-row .who { min-width: 0; }
     .lb-row .who b { font-size: 16px; font-weight: 600; letter-spacing: 0.02em; display: flex; align-items: center; gap: 7px; }
@@ -71,11 +76,12 @@
     .lb-row .score .big { font-size: 26px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
     .lb-row .score .big.lead { color: var(--foco); }
     .lb-row .score .lbl { font-family: var(--mono); font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--cal-dim); margin-top: 3px; }
+    .lb-row .chev { font-size: 13px; color: var(--cal-dim); text-align: center; transition: transform .2s; }
+    .lb-row .chev.up { transform: rotate(180deg); }
 
-    /* Encabezado de detalle */
-    .detail-head { margin: 28px 4px 6px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid var(--linea); padding-bottom: 10px; }
-    .detail-head b { font-size: 17px; font-weight: 600; letter-spacing: 0.03em; }
-    .detail-head span { font-family: var(--mono); font-size: 11px; color: var(--foco); letter-spacing: 0.06em; }
+    /* Panel desplegable con los 4 países de la persona */
+    .panel { padding: 2px 15px 8px; border-top: 1px solid var(--linea); animation: drop .18s ease; }
+    @keyframes drop { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 
     /* Tarjeta de país (pick) */
     .pick {
@@ -117,7 +123,7 @@
     .state.error .ball { border-color: var(--sello); }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    @media (prefers-reduced-motion: reduce) { .dot.on, .pick .live, .state.loading .ball { animation: none; } }
+    @media (prefers-reduced-motion: reduce) { .dot.on, .pick .live, .state.loading .ball, .panel { animation: none; } .lb-row .chev { transition: none; } }
   </style>
 </head>
 <body>
@@ -149,15 +155,15 @@
     /* ════════════════════════════════════════════════════════════════
        1) PEGA AQUÍ TU CONFIG DE FIREBASE  (la MISMA del otro app)
        ════════════════════════════════════════════════════════════════ */
-const firebaseConfig = {
-  apiKey: "AIzaSyAWayY2QF67kXl6nvXsl9x4XN8tXdVZC6Q",
-  authDomain: "quiniela-mundial-401dd.firebaseapp.com",
-  projectId: "quiniela-mundial-401dd",
-  storageBucket: "quiniela-mundial-401dd.firebasestorage.app",
-  messagingSenderId: "1036666116455",
-  appId: "1:1036666116455:web:948f43dcdfc90359d8b7c2",
-  measurementId: "G-0L84YRPBME"
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyAWayY2QF67kXl6nvXsl9x4XN8tXdVZC6Q",
+      authDomain: "quiniela-mundial-401dd.firebaseapp.com",
+      projectId: "quiniela-mundial-401dd",
+      storageBucket: "quiniela-mundial-401dd.firebasestorage.app",
+      messagingSenderId: "1036666116455",
+      appId: "1:1036666116455:web:948f43dcdfc90359d8b7c2",
+      measurementId: "G-0L84YRPBME"
+    };
     const COLECCION = "equipos_quiniela";
 
     /* ════════════════════════════════════════════════════════════════
@@ -188,16 +194,16 @@ const firebaseConfig = {
       republicacheca: ["Czechia", "Czech Republic"], qatar: ["Qatar"], algeria: ["Algeria"],
       brasil: ["Brazil"], jordania: ["Jordan"], arabiasaudita: ["Saudi Arabia"],
       sudafrica: ["South Africa"], mexico: ["Mexico"], escocia: ["Scotland"], ghana: ["Ghana"],
-      congo: ["DR Congo", "Congo DR", "Democratic Republic of Congo", "Congo"],
+      congo: ["Congo DR", "DR Congo", "Democratic Republic of Congo"],
       estadosunidos: ["United States", "USA"], panama: ["Panama"], australia: ["Australia"],
-      caboverde: ["Cape Verde", "Cabo Verde"], francia: ["France"], nuevazelanda: ["New Zealand"],
+      caboverde: ["Cape Verde Islands", "Cape Verde", "Cabo Verde"], francia: ["France"], nuevazelanda: ["New Zealand"],
       iran: ["Iran", "IR Iran"], egipto: ["Egypt"], espana: ["Spain"], tunez: ["Tunisia"],
-      costademarfil: ["Côte d'Ivoire", "Cote d'Ivoire", "Ivory Coast"], japon: ["Japan"],
+      costademarfil: ["Ivory Coast", "Côte d'Ivoire", "Cote d'Ivoire"], japon: ["Japan"],
       canada: ["Canada"], colombia: ["Colombia"], austria: ["Austria"], senegal: ["Senegal"],
-      paisesbajos: ["Netherlands", "Holland"], turquia: ["Türkiye", "Turkiye", "Turkey"],
+      paisesbajos: ["Netherlands", "Holland"], turquia: ["Turkey", "Türkiye", "Turkiye"],
       coreadelsur: ["South Korea", "Korea Republic", "Republic of Korea"], marruecos: ["Morocco"],
       alemania: ["Germany"], ecuador: ["Ecuador"], suecia: ["Sweden"],
-      bosnia: ["Bosnia and Herzegovina", "Bosnia-Herzegovina", "Bosnia & Herzegovina"],
+      bosnia: ["Bosnia-Herzegovina", "Bosnia and Herzegovina", "Bosnia & Herzegovina"],
       argentina: ["Argentina"], uruguay: ["Uruguay"], uzbekistan: ["Uzbekistan"],
       paraguay: ["Paraguay"], belgica: ["Belgium"], noruega: ["Norway"], irak: ["Iraq"],
       curazao: ["Curaçao", "Curacao"], inglaterra: ["England"],
@@ -211,8 +217,8 @@ const firebaseConfig = {
     const board = $("board"), lb = $("leaderboard");
     const lastUpdateEl = $("lastUpdate"), connDot = $("connDot"), connLabel = $("connLabel");
 
-    let ALL = [];     // equipos del Mundial desde Firestore
-    let sel = 0;      // persona seleccionada (índice)
+    let ALL = [];          // equipos del Mundial desde Firestore
+    const abiertos = new Set(); // índices de personas desplegadas (toggle independiente)
     let lastSyncMs = null;
 
     // ---------- Conexión / reloj ----------
@@ -262,7 +268,7 @@ const firebaseConfig = {
     }
 
     // ---------- Render ----------
-    function renderLeaderboard() {
+    function renderAccordion() {
       const vivos = PERSONAS.map(vivosDe);
       const maxV = Math.max(...vivos);
 
@@ -270,21 +276,33 @@ const firebaseConfig = {
         const v = vivos[i];
         const lider = v === maxV && maxV > 0;
         const pct = Math.round((v / 4) * 100);
-        return `<button class="lb-row ${i === sel ? "active" : ""}" data-i="${i}">
-          <div class="seed">${i + 1}</div>
-          <div class="who">
-            <b>${escapeHtml(p.nombre)}${lider ? `<span class="lead-tag">va arriba</span>` : ""}</b>
-            <div class="bar"><i style="width:${pct}%"></i></div>
-          </div>
-          <div class="score"><div class="big ${lider ? "lead" : ""}">${v}</div><div class="lbl">vivos / 4</div></div>
-        </button>`;
+        const abierto = abiertos.has(i);
+        const panel = abierto
+          ? `<div class="panel">${p.picks.map((pk, idx) => pickCard(pk, idx + 1)).join("")}</div>`
+          : "";
+        return `<div class="person ${abierto ? "active" : ""}">
+          <button class="lb-row" data-i="${i}" aria-expanded="${abierto}">
+            <div class="seed">${i + 1}</div>
+            <div class="who">
+              <b>${escapeHtml(p.nombre)}${lider ? `<span class="lead-tag">va arriba</span>` : ""}</b>
+              <div class="bar"><i style="width:${pct}%"></i></div>
+            </div>
+            <div class="score"><div class="big ${lider ? "lead" : ""}">${v}</div><div class="lbl">vivos / 4</div></div>
+            <div class="chev ${abierto ? "up" : ""}" aria-hidden="true">▾</div>
+          </button>
+          ${panel}
+        </div>`;
       }).join("");
       lb.hidden = false;
 
       lb.querySelectorAll(".lb-row").forEach((btn) =>
-        btn.addEventListener("click", () => { sel = Number(btn.dataset.i); renderLeaderboard(); })
+        btn.addEventListener("click", () => {
+          const i = Number(btn.dataset.i);
+          if (abiertos.has(i)) abiertos.delete(i);
+          else abiertos.add(i);
+          renderAccordion();
+        })
       );
-      renderDetalle(sel);
     }
 
     function pickCard(pickEs, rank) {
@@ -312,14 +330,6 @@ const firebaseConfig = {
       </div>`;
     }
 
-    function renderDetalle(i) {
-      const p = PERSONAS[i];
-      const v = vivosDe(p);
-      let html = `<div class="detail-head"><b>${escapeHtml(p.nombre)}</b><span>${v} vivos / 4</span></div>`;
-      html += p.picks.map((pk, idx) => pickCard(pk, idx + 1)).join("");
-      board.innerHTML = html;
-    }
-
     function render() {
       if (!ALL.length) {
         lb.hidden = true;
@@ -328,7 +338,8 @@ const firebaseConfig = {
           <p>En cuanto el bot escriba las selecciones en Firestore, aparecerán aquí.</p></div>`;
         return;
       }
-      renderLeaderboard();
+      board.innerHTML = "";
+      renderAccordion();
     }
 
     // ---------- Firestore en vivo ----------
