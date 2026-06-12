@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Quiniela Mundialista 2026 — Porra</title>
+  <meta name="theme-color" content="#0E3B2A" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Porra" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --cesped: #0E3B2A; --cesped-2: #0A3022; --cesped-3: #07251A;
+      --linea: rgba(242, 245, 239, 0.14);
+      --cal: #F2F5EF; --cal-dim: rgba(242, 245, 239, 0.55); --cal-faint: rgba(242, 245, 239, 0.30);
+      --foco: #F5B82E; --vivo: #3FCB74; --ceniza: #6C7A71; --sello: #C5453B;
+      --display: "Oswald", system-ui, "Segoe UI", sans-serif;
+      --mono: "Space Mono", ui-monospace, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--display); color: var(--cal);
+      background: radial-gradient(120% 80% at 50% -10%, var(--cesped) 0%, var(--cesped-2) 55%, var(--cesped-3) 100%);
+      background-attachment: fixed; min-height: 100dvh; -webkit-font-smoothing: antialiased;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .wrap { max-width: 560px; margin: 0 auto; padding: 0 16px 48px; }
+
+    /* Top bar */
+    .topbar {
+      position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 12px;
+      padding: calc(14px + env(safe-area-inset-top)) 16px 14px;
+      background: linear-gradient(180deg, var(--cesped) 0%, rgba(14,59,42,0.92) 100%);
+      backdrop-filter: blur(8px); border-bottom: 1px solid var(--linea);
+    }
+    .topbar .mark { width: 34px; height: 34px; border-radius: 9px; flex: none; background: var(--cesped-3); border: 1.5px solid var(--cal-faint); position: relative; }
+    .topbar .mark::before { content: ""; position: absolute; inset: 0; margin: auto; width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--cal-dim); }
+    .topbar .mark::after { content: ""; position: absolute; inset: 0; margin: auto; width: 6px; height: 6px; border-radius: 50%; background: var(--foco); }
+    .topbar h1 { font-size: 13.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; line-height: 1.15; }
+    .topbar .sub { font-family: var(--mono); font-size: 10.5px; color: var(--cal-dim); margin-top: 3px; }
+    .topbar .pulse { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+    .dot.on { background: var(--vivo); animation: ping 2s infinite; }
+    .dot.off { background: var(--ceniza); }
+    .pulse span { font-family: var(--mono); font-size: 10px; color: var(--cal-dim); text-transform: uppercase; letter-spacing: 0.08em; }
+    @keyframes ping { 0% { box-shadow: 0 0 0 0 rgba(63,203,116,0.5); } 70% { box-shadow: 0 0 0 7px rgba(63,203,116,0); } 100% { box-shadow: 0 0 0 0 rgba(63,203,116,0); } }
+
+    /* Leaderboard de personas */
+    .lb { margin-top: 20px; display: flex; flex-direction: column; gap: 9px; }
+    .lb-row {
+      display: grid; grid-template-columns: 26px 1fr auto; align-items: center; gap: 13px;
+      width: 100%; text-align: left; cursor: pointer; font-family: var(--display); color: var(--cal);
+      padding: 13px 15px; border: 1px solid var(--linea); border-radius: 15px;
+      background: linear-gradient(180deg, rgba(242,245,239,0.04), rgba(0,0,0,0.10));
+      transition: border-color .15s, background .15s;
+    }
+    .lb-row.active { border-color: var(--foco); background: linear-gradient(180deg, rgba(245,184,46,0.10), rgba(0,0,0,0.10)); }
+    .lb-row .seed { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--cal-faint); text-align: center; }
+    .lb-row .who { min-width: 0; }
+    .lb-row .who b { font-size: 16px; font-weight: 600; letter-spacing: 0.02em; display: flex; align-items: center; gap: 7px; }
+    .lb-row .lead-tag { font-family: var(--mono); font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--cesped-3); background: var(--foco); padding: 2px 5px; border-radius: 4px; }
+    .lb-row .bar { margin-top: 8px; height: 4px; border-radius: 3px; background: rgba(242,245,239,0.10); overflow: hidden; }
+    .lb-row .bar i { display: block; height: 100%; background: var(--vivo); border-radius: 3px; transition: width .3s; }
+    .lb-row .score { text-align: right; flex: none; }
+    .lb-row .score .big { font-size: 26px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+    .lb-row .score .big.lead { color: var(--foco); }
+    .lb-row .score .lbl { font-family: var(--mono); font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--cal-dim); margin-top: 3px; }
+
+    /* Encabezado de detalle */
+    .detail-head { margin: 28px 4px 6px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid var(--linea); padding-bottom: 10px; }
+    .detail-head b { font-size: 17px; font-weight: 600; letter-spacing: 0.03em; }
+    .detail-head span { font-family: var(--mono); font-size: 11px; color: var(--foco); letter-spacing: 0.06em; }
+
+    /* Tarjeta de país (pick) */
+    .pick {
+      position: relative; overflow: hidden;
+      display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 13px;
+      padding: 14px 4px; border-bottom: 1px solid var(--linea);
+    }
+    .pick .rank { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--foco); text-align: center; }
+    .pick .who { display: flex; align-items: center; gap: 11px; min-width: 0; }
+    .pick .crest { width: 24px; height: 24px; object-fit: contain; flex: none; filter: drop-shadow(0 1px 2px rgba(0,0,0,.35)); }
+    .pick .col { min-width: 0; }
+    .pick .name { font-size: 18px; font-weight: 500; letter-spacing: 0.02em; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pick .meta { font-family: var(--mono); font-size: 9.5px; color: var(--cal-dim); letter-spacing: 0.04em; margin-top: 3px; }
+    .pick .live { width: 7px; height: 7px; border-radius: 50%; background: var(--vivo); flex: none; animation: ping 2s infinite; }
+    .pick .stats { display: flex; align-items: baseline; gap: 13px; }
+    .pick .pts { font-size: 24px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+    .pick .pts small { display: block; font-family: var(--mono); font-size: 8px; font-weight: 400; letter-spacing: 0.12em; color: var(--cal-faint); text-transform: uppercase; margin-top: 3px; text-align: center; }
+
+    .pick.out { color: var(--ceniza); }
+    .pick.out .name { color: var(--ceniza); text-decoration: line-through; text-decoration-color: rgba(108,122,113,.55); }
+    .pick.out .rank, .pick.out .pts { color: var(--ceniza); }
+    .pick.out .crest { filter: grayscale(1) brightness(0.85); opacity: 0.55; }
+    .pick.qualy .rank { color: var(--foco); }
+    .pick .stamp {
+      position: absolute; right: -8px; top: 50%; transform: translateY(-50%) rotate(-9deg);
+      font-size: 12px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--sello); border: 2.5px solid var(--sello); padding: 3px 9px; border-radius: 4px;
+      opacity: 0.78; pointer-events: none; mix-blend-mode: screen;
+    }
+    .pick.nodata .name { color: var(--cal-dim); }
+    .pick.nodata .meta { color: var(--cal-faint); }
+
+    /* Estados */
+    .state { text-align: center; padding: 60px 24px; color: var(--cal-dim); }
+    .state h2 { font-weight: 500; font-size: 20px; color: var(--cal); margin-bottom: 8px; }
+    .state p { font-family: var(--mono); font-size: 12px; line-height: 1.7; max-width: 320px; margin: 0 auto; }
+    .state .ball { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--cal-faint); margin: 0 auto 20px; }
+    .state.loading .ball { animation: spin 1.1s linear infinite; border-top-color: var(--foco); }
+    .state.error .ball { border-color: var(--sello); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (prefers-reduced-motion: reduce) { .dot.on, .pick .live, .state.loading .ball { animation: none; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="mark" aria-hidden="true"></div>
+    <div>
+      <h1>Quiniela Mundialista 2026</h1>
+      <div class="sub" id="lastUpdate">Conectando…</div>
+    </div>
+    <div class="pulse"><span id="connLabel">en vivo</span><i class="dot off" id="connDot"></i></div>
+  </header>
+
+  <main class="wrap">
+    <section class="lb" id="leaderboard" hidden></section>
+    <div id="board">
+      <div class="state loading" id="loading">
+        <div class="ball"></div>
+        <h2>Cargando la porra</h2>
+        <p>Trayendo el estatus de las selecciones desde Firestore.</p>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { initializeFirestore, persistentLocalCache, collection, onSnapshot }
+      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    /* ════════════════════════════════════════════════════════════════
+       1) PEGA AQUÍ TU CONFIG DE FIREBASE  (la MISMA del otro app)
+       ════════════════════════════════════════════════════════════════ */
+    const firebaseConfig = {
+      apiKey: "TU_API_KEY",
+      authDomain: "TU_PROYECTO.firebaseapp.com",
+      projectId: "TU_PROYECTO",
+      storageBucket: "TU_PROYECTO.appspot.com",
+      messagingSenderId: "TU_SENDER_ID",
+      appId: "TU_APP_ID"
+    };
+    const COLECCION = "equipos_quiniela";
+
+    /* ════════════════════════════════════════════════════════════════
+       2) LA RIFA — 12 personas, 4 países cada una (orden 1°,2°,3°,4°)
+       ════════════════════════════════════════════════════════════════ */
+    const PERSONAS = [
+      { nombre: "Cesar Centeno", picks: ["Portugal", "Croacia", "Haití", "Suiza"] },
+      { nombre: "Braulio Leija", picks: ["Brasil", "Algeria", "Qatar", "República Checa"] },
+      { nombre: "Daniel Toledo", picks: ["México", "Sudáfrica", "Arabia Saudita", "Jordania"] },
+      { nombre: "Alfredo G",     picks: ["Estados Unidos", "Congo", "Ghana", "Escocia"] },
+      { nombre: "Gerardo P",     picks: ["Francia", "Cabo Verde", "Australia", "Panamá"] },
+      { nombre: "Jorge T",       picks: ["España", "Egipto", "Irán", "Nueva Zelanda"] },
+      { nombre: "Mary H",        picks: ["Canadá", "Japón", "Costa de Marfil", "Túnez"] },
+      { nombre: "Angel B",       picks: ["Países Bajos", "Senegal", "Austria", "Colombia"] },
+      { nombre: "Luciano",       picks: ["Alemania", "Marruecos", "Corea del Sur", "Turquía"] },
+      { nombre: "Amado H",       picks: ["Argentina", "Bosnia", "Suecia", "Ecuador"] },
+      { nombre: "Junior",        picks: ["Bélgica", "Paraguay", "Uzbekistán", "Uruguay"] },
+      { nombre: "Maritere",      picks: ["Inglaterra", "Curazao", "Irak", "Noruega"] },
+    ];
+
+    /* ════════════════════════════════════════════════════════════════
+       3) DICCIONARIO español → posibles nombres en Firestore (inglés).
+       Si algún país sale "sin datos", agrega aquí el nombre EXACTO que
+       veas en Firestore (campo "id") como un alias más.
+       ════════════════════════════════════════════════════════════════ */
+    const ALIAS = {
+      suiza: ["Switzerland"], haiti: ["Haiti"], croacia: ["Croatia"], portugal: ["Portugal"],
+      republicacheca: ["Czechia", "Czech Republic"], qatar: ["Qatar"], algeria: ["Algeria"],
+      brasil: ["Brazil"], jordania: ["Jordan"], arabiasaudita: ["Saudi Arabia"],
+      sudafrica: ["South Africa"], mexico: ["Mexico"], escocia: ["Scotland"], ghana: ["Ghana"],
+      congo: ["DR Congo", "Congo DR", "Democratic Republic of Congo", "Congo"],
+      estadosunidos: ["United States", "USA"], panama: ["Panama"], australia: ["Australia"],
+      caboverde: ["Cape Verde", "Cabo Verde"], francia: ["France"], nuevazelanda: ["New Zealand"],
+      iran: ["Iran", "IR Iran"], egipto: ["Egypt"], espana: ["Spain"], tunez: ["Tunisia"],
+      costademarfil: ["Côte d'Ivoire", "Cote d'Ivoire", "Ivory Coast"], japon: ["Japan"],
+      canada: ["Canada"], colombia: ["Colombia"], austria: ["Austria"], senegal: ["Senegal"],
+      paisesbajos: ["Netherlands", "Holland"], turquia: ["Türkiye", "Turkiye", "Turkey"],
+      coreadelsur: ["South Korea", "Korea Republic", "Republic of Korea"], marruecos: ["Morocco"],
+      alemania: ["Germany"], ecuador: ["Ecuador"], suecia: ["Sweden"],
+      bosnia: ["Bosnia and Herzegovina", "Bosnia-Herzegovina", "Bosnia & Herzegovina"],
+      argentina: ["Argentina"], uruguay: ["Uruguay"], uzbekistan: ["Uzbekistan"],
+      paraguay: ["Paraguay"], belgica: ["Belgium"], noruega: ["Norway"], irak: ["Iraq"],
+      curazao: ["Curaçao", "Curacao"], inglaterra: ["England"],
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = initializeFirestore(app, { localCache: persistentLocalCache({}) });
+
+    // ---------- DOM ----------
+    const $ = (id) => document.getElementById(id);
+    const board = $("board"), lb = $("leaderboard");
+    const lastUpdateEl = $("lastUpdate"), connDot = $("connDot"), connLabel = $("connLabel");
+
+    let ALL = [];     // equipos del Mundial desde Firestore
+    let sel = 0;      // persona seleccionada (índice)
+    let lastSyncMs = null;
+
+    // ---------- Conexión / reloj ----------
+    function setConn(on) { connDot.className = "dot " + (on ? "on" : "off"); connLabel.textContent = on ? "en vivo" : "sin conexión"; }
+    window.addEventListener("online", () => setConn(true));
+    window.addEventListener("offline", () => setConn(false));
+    setConn(navigator.onLine);
+
+    function tiempoRel(ms) {
+      if (!ms) return "—";
+      const m = Math.round((Date.now() - ms) / 60000);
+      if (m < 1) return "actualizado hace un momento";
+      if (m < 60) return `actualizado hace ${m} min`;
+      const h = Math.round(m / 60);
+      if (h < 24) return `actualizado hace ${h} h`;
+      return `actualizado hace ${Math.round(h / 24)} d`;
+    }
+    function reloj() { lastUpdateEl.textContent = lastSyncMs ? tiempoRel(lastSyncMs) : "Sin datos aún"; }
+    setInterval(reloj, 30000);
+
+    // ---------- Búsqueda tolerante de país ----------
+    const norm = (s) => String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    function matchTeam(pickEs) {
+      const candidatos = ALIAS[norm(pickEs)] || [pickEs];
+      for (const cand of candidatos) {
+        const nc = norm(cand);
+        const hit = ALL.find((e) => {
+          const ni = norm(e.id);
+          return ni === nc || ni.includes(nc) || nc.includes(ni);
+        });
+        if (hit) return hit;
+      }
+      return null;
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (c) =>
+        ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    }
+
+    // vivos = picks con dato y status != eliminado
+    function vivosDe(persona) {
+      return persona.picks.reduce((n, p) => {
+        const t = matchTeam(p);
+        return n + (t && t.status !== "eliminado" ? 1 : 0);
+      }, 0);
+    }
+
+    // ---------- Render ----------
+    function renderLeaderboard() {
+      const vivos = PERSONAS.map(vivosDe);
+      const maxV = Math.max(...vivos);
+
+      lb.innerHTML = PERSONAS.map((p, i) => {
+        const v = vivos[i];
+        const lider = v === maxV && maxV > 0;
+        const pct = Math.round((v / 4) * 100);
+        return `<button class="lb-row ${i === sel ? "active" : ""}" data-i="${i}">
+          <div class="seed">${i + 1}</div>
+          <div class="who">
+            <b>${escapeHtml(p.nombre)}${lider ? `<span class="lead-tag">va arriba</span>` : ""}</b>
+            <div class="bar"><i style="width:${pct}%"></i></div>
+          </div>
+          <div class="score"><div class="big ${lider ? "lead" : ""}">${v}</div><div class="lbl">vivos / 4</div></div>
+        </button>`;
+      }).join("");
+      lb.hidden = false;
+
+      lb.querySelectorAll(".lb-row").forEach((btn) =>
+        btn.addEventListener("click", () => { sel = Number(btn.dataset.i); renderLeaderboard(); })
+      );
+      renderDetalle(sel);
+    }
+
+    function pickCard(pickEs, rank) {
+      const t = matchTeam(pickEs);
+      if (!t) {
+        return `<div class="pick nodata">
+          <div class="rank">${rank}°</div>
+          <div class="who"><div class="col"><div class="name">${escapeHtml(pickEs)}</div>
+            <div class="meta">sin datos en el torneo aún</div></div></div>
+          <div class="stats"></div>
+        </div>`;
+      }
+      const out = t.status === "eliminado";
+      const qualy = !out && (t.posicion === 1 || t.posicion === 2);
+      const meta = `Grupo ${t.grupo ?? "?"}${t.posicion ? ` · ${t.posicion}° lugar` : ""}`;
+      return `<div class="pick ${out ? "out" : ""} ${qualy ? "qualy" : ""}">
+        <div class="rank">${rank}°</div>
+        <div class="who">
+          ${t.logo ? `<img class="crest" src="${t.logo}" alt="" loading="lazy">` : ""}
+          <div class="col"><div class="name">${escapeHtml(pickEs)}</div><div class="meta">${meta}</div></div>
+          ${out ? "" : `<i class="live" aria-hidden="true"></i>`}
+        </div>
+        <div class="stats"><div class="pts">${t.puntos ?? 0}<small>pts</small></div></div>
+        ${out ? `<span class="stamp">Eliminado</span>` : ""}
+      </div>`;
+    }
+
+    function renderDetalle(i) {
+      const p = PERSONAS[i];
+      const v = vivosDe(p);
+      let html = `<div class="detail-head"><b>${escapeHtml(p.nombre)}</b><span>${v} vivos / 4</span></div>`;
+      html += p.picks.map((pk, idx) => pickCard(pk, idx + 1)).join("");
+      board.innerHTML = html;
+    }
+
+    function render() {
+      if (!ALL.length) {
+        lb.hidden = true;
+        board.innerHTML = `<div class="state"><div class="ball" style="animation:none"></div>
+          <h2>Todavía no hay datos</h2>
+          <p>En cuanto el bot escriba las selecciones en Firestore, aparecerán aquí.</p></div>`;
+        return;
+      }
+      renderLeaderboard();
+    }
+
+    // ---------- Firestore en vivo ----------
+    onSnapshot(collection(db, COLECCION),
+      (snap) => {
+        const equipos = []; let maxTs = 0;
+        snap.forEach((doc) => {
+          const d = doc.data(); equipos.push(d);
+          const ts = d.ultimo_update?.toMillis?.(); if (ts && ts > maxTs) maxTs = ts;
+        });
+        lastSyncMs = maxTs || Date.now();
+        reloj();
+        ALL = equipos;
+        render();
+        // Aviso en consola de los países que no encontraron dato (para afinar ALIAS)
+        const faltan = [...new Set(PERSONAS.flatMap((p) => p.picks).filter((pk) => !matchTeam(pk)))];
+        if (faltan.length) console.warn("Sin match en Firestore:", faltan);
+      },
+      (err) => {
+        console.error(err);
+        lb.hidden = true;
+        board.innerHTML = `<div class="state error"><div class="ball"></div>
+          <h2>No se pudo leer Firestore</h2>
+          <p>Revisa el firebaseConfig y que las reglas permitan lectura de "${COLECCION}". Detalle: ${escapeHtml(err.code || err.message)}.</p></div>`;
+      }
+    );
+
+    // Permite instalar/abrir sin service worker propio (es una página suelta).
+  </script>
+</body>
+</html>
