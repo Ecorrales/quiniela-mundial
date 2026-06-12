@@ -21,7 +21,7 @@ const admin = require("firebase-admin");
 // ---------- Configuración ----------
 const API_BASE = "https://api.football-data.org/v4";
 const COMPETITION = process.env.COMPETITION || "WC"; // WC = FIFA World Cup
-const GRUPOS_OBJETIVO = (process.env.GRUPOS || "C,E,K")
+const GRUPOS_OBJETIVO = (process.env.GRUPOS || "A,B,C,D,E,F,G,H,I,J,K,L")
   .split(",")
   .map((g) => g.trim().toUpperCase());
 const COLECCION = process.env.COLECCION || "equipos_quiniela";
