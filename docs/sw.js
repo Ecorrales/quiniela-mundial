@@ -5,7 +5,7 @@
  *   - Firestore tiene su propia persistencia offline (se activa en index.html),
  *     por eso NO interceptamos sus peticiones aquí.
  */
-const CACHE = "quiniela-v1";
+const CACHE = "quiniela-v3";
 const SHELL = [
   "./",
   "./index.html",

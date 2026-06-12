@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Quiniela Mundial · C · E · K</title>
+  <title>Quiniela Mundialista ACT 2026</title>
   <meta name="theme-color" content="#0E3B2A" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
@@ -73,8 +73,8 @@
       width: 6px; height: 6px; border-radius: 50%; background: var(--foco);
     }
     .topbar h1 {
-      font-size: 15px; font-weight: 600; letter-spacing: 0.14em;
-      text-transform: uppercase; line-height: 1;
+      font-size: 13.5px; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; line-height: 1.15;
     }
     .topbar .sub {
       font-family: var(--mono); font-size: 10.5px; color: var(--cal-dim);
@@ -90,22 +90,6 @@
       70% { box-shadow: 0 0 0 7px rgba(63, 203, 116, 0); }
       100% { box-shadow: 0 0 0 0 rgba(63, 203, 116, 0); }
     }
-
-    /* ---------- Hero tally ---------- */
-    .tally {
-      margin: 22px 0 8px;
-      display: grid; grid-template-columns: 1fr auto 1fr;
-      align-items: center; gap: 8px;
-      padding: 22px 20px;
-      border: 1px solid var(--linea); border-radius: 18px;
-      background:
-        linear-gradient(180deg, rgba(242, 245, 239, 0.04), rgba(0, 0, 0, 0.10));
-    }
-    .tally .num { font-size: 56px; font-weight: 700; line-height: 0.9; text-align: center; font-variant-numeric: tabular-nums; }
-    .tally .num.alive { color: var(--cal); }
-    .tally .num.out { color: var(--ceniza); }
-    .tally .lbl { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cal-dim); margin-top: 8px; text-align: center; }
-    .tally .vs { width: 1px; height: 54px; background: var(--linea); }
 
     /* ---------- Group section ---------- */
     .grupo { margin-top: 30px; }
@@ -159,6 +143,33 @@
       pointer-events: none; mix-blend-mode: screen;
     }
 
+    /* ---------- Marcador de participantes ---------- */
+    .lb { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+    .lb-row {
+      display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 14px;
+      width: 100%; text-align: left; cursor: pointer;
+      font-family: var(--display); color: var(--cal);
+      padding: 15px 16px; border: 1px solid var(--linea); border-radius: 16px;
+      background: linear-gradient(180deg, rgba(242,245,239,0.04), rgba(0,0,0,0.10));
+      transition: border-color .15s, background .15s;
+    }
+    .lb-row.active { border-color: var(--foco); background: linear-gradient(180deg, rgba(245,184,46,0.10), rgba(0,0,0,0.10)); }
+    .lb-row .eq { min-width: 0; }
+    .lb-row .eq b { font-size: 18px; font-weight: 600; letter-spacing: 0.04em; display: flex; align-items: center; gap: 7px; }
+    .lb-row .eq .lead-tag { font-family: var(--mono); font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--cesped-3); background: var(--foco); padding: 2px 5px; border-radius: 4px; }
+    .lb-row .eq .grps { font-family: var(--mono); font-size: 10px; color: var(--cal-dim); letter-spacing: 0.08em; margin-top: 4px; display: block; }
+    .lb-row .bar { margin-top: 9px; height: 4px; border-radius: 3px; background: rgba(242,245,239,0.10); overflow: hidden; }
+    .lb-row .bar i { display: block; height: 100%; background: var(--vivo); border-radius: 3px; transition: width .3s; }
+    .lb-row .score { text-align: right; flex: none; }
+    .lb-row .score .big { font-size: 30px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+    .lb-row .score .big.lead { color: var(--foco); }
+    .lb-row .score .lbl { font-family: var(--mono); font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--cal-dim); margin-top: 4px; }
+
+    /* ---------- Encabezado de detalle ---------- */
+    .detail-head { margin: 28px 4px 2px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+    .detail-head b { font-size: 16px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+    .detail-head span { font-family: var(--mono); font-size: 11px; color: var(--foco); letter-spacing: 0.06em; }
+
     /* ---------- States ---------- */
     .state { text-align: center; padding: 60px 24px; color: var(--cal-dim); }
     .state h2 { font-weight: 500; font-size: 20px; letter-spacing: 0.04em; color: var(--cal); margin-bottom: 8px; }
@@ -196,24 +207,20 @@
   <header class="topbar">
     <div class="mark" aria-hidden="true"></div>
     <div>
-      <h1>Quiniela Mundial</h1>
+      <h1>Quiniela Mundialista ACT 2026</h1>
       <div class="sub" id="lastUpdate">Conectando…</div>
     </div>
     <div class="pulse"><span id="connLabel">en vivo</span><i class="dot off" id="connDot"></i></div>
   </header>
 
   <main class="wrap">
-    <section class="tally" id="tally" hidden>
-      <div><div class="num alive" id="cntAlive">0</div><span class="lbl">En juego</span></div>
-      <div class="vs" aria-hidden="true"></div>
-      <div><div class="num out" id="cntOut">0</div><span class="lbl">Fuera</span></div>
-    </section>
+    <section class="lb" id="leaderboard" hidden></section>
 
     <div id="board">
       <div class="state loading" id="loading">
         <div class="ball"></div>
         <h2>Cargando la cancha</h2>
-        <p>Trayendo el estatus de los grupos C, E y K desde Firestore.</p>
+        <p>Trayendo el estatus de los 12 grupos del Mundial desde Firestore.</p>
       </div>
     </div>
   </main>
@@ -239,17 +246,15 @@
        Como esta app SOLO LEE, basta con que las reglas de Firestore
        permitan lectura pública de la colección equipos_quiniela.
        ════════════════════════════════════════════════════════════════ */
-const firebaseConfig = {
-  apiKey: "AIzaSyAWayY2QF67kXl6nvXsl9x4XN8tXdVZC6Q",
-  authDomain: "quiniela-mundial-401dd.firebaseapp.com",
-  projectId: "quiniela-mundial-401dd",
-  storageBucket: "quiniela-mundial-401dd.firebasestorage.app",
-  messagingSenderId: "1036666116455",
-  appId: "1:1036666116455:web:948f43dcdfc90359d8b7c2",
-  measurementId: "G-0L84YRPBME"
-};
+    const firebaseConfig = {
+      apiKey: "TU_API_KEY",
+      authDomain: "TU_PROYECTO.firebaseapp.com",
+      projectId: "TU_PROYECTO",
+      storageBucket: "TU_PROYECTO.appspot.com",
+      messagingSenderId: "TU_SENDER_ID",
+      appId: "TU_APP_ID"
+    };
     const COLECCION = "equipos_quiniela";
-    const GRUPOS = ["C", "E", "K"];
 
     const app = initializeApp(firebaseConfig);
     // Persistencia offline: la última lectura sobrevive sin red.
@@ -257,9 +262,21 @@ const firebaseConfig = {
 
     // ---------- DOM ----------
     const $ = (id) => document.getElementById(id);
-    const board = $("board"), tally = $("tally");
-    const cntAlive = $("cntAlive"), cntOut = $("cntOut");
+    const board = $("board"), lb = $("leaderboard");
     const lastUpdateEl = $("lastUpdate"), connDot = $("connDot"), connLabel = $("connLabel");
+
+    // ---------- Asignación FIJA de la rifa (no editable) ----------
+    // Cada participante (Equipo 1–4) tiene 3 grupos del Mundial.
+    const QUINIELA = {
+      1: ["F", "A", "L"],
+      2: ["G", "B", "I"],
+      3: ["D", "H", "J"],
+      4: ["K", "E", "C"],
+    };
+    const PARTICIPANTES = [1, 2, 3, 4];
+
+    let ALL = [];     // todos los equipos del Mundial que llegan de Firestore
+    let sel = 1;      // participante seleccionado (solo en memoria)
 
     let lastSyncMs = null;
 
@@ -286,72 +303,113 @@ const firebaseConfig = {
     setInterval(refrescarReloj, 30000);
 
     // ---------- Render ----------
-    function render(equipos) {
-      if (!equipos.length) {
-        tally.hidden = true;
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (c) =>
+        ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    }
+
+    const equiposDe = (n) => ALL.filter((e) => QUINIELA[n].includes(e.grupo));
+    const vivosDe = (lista) => lista.filter((t) => t.status !== "eliminado").length;
+    const porPosicion = (a, b) => {
+      const pa = a.posicion ?? 99, pb = b.posicion ?? 99;
+      if (pa !== pb) return pa - pb;
+      return (b.puntos ?? 0) - (a.puntos ?? 0);
+    };
+
+    // Tarjeta de un equipo (punto "vivo" o sello ELIMINADO)
+    function buildTeamRow(t) {
+      const out = t.status === "eliminado";
+      const qualy = !out && (t.posicion === 1 || t.posicion === 2);
+      const gf = t.goles_favor ?? 0, gc = t.goles_contra ?? 0;
+      const dif = t.diferencia ?? gf - gc;
+      const difTxt = dif > 0 ? `+${dif}` : `${dif}`;
+      return `<div class="team ${out ? "out" : ""} ${qualy ? "qualy" : ""}">
+        <div class="pos">${t.posicion ?? "–"}</div>
+        <div class="who">
+          ${t.logo ? `<img class="crest" src="${t.logo}" alt="" loading="lazy">` : ""}
+          <span class="name">${escapeHtml(t.id || "—")}</span>
+          ${out ? "" : `<i class="live" aria-hidden="true"></i>`}
+        </div>
+        <div class="stats">
+          <div class="goles">${gf}<em>:</em>${gc} <em>·</em> ${difTxt}</div>
+          <div class="pts">${t.puntos ?? 0}<small>pts</small></div>
+        </div>
+        ${out ? `<span class="stamp">Eliminado</span>` : ""}
+      </div>`;
+    }
+
+    // Marcador: los 4 participantes con sus grupos y cuántos equipos siguen vivos.
+    function renderLeaderboard() {
+      const stats = {};
+      for (const n of PARTICIPANTES) {
+        const eq = equiposDe(n);
+        stats[n] = { vivos: vivosDe(eq), total: eq.length };
+      }
+      const maxVivos = Math.max(...PARTICIPANTES.map((n) => stats[n].vivos));
+
+      lb.innerHTML = PARTICIPANTES.map((n) => {
+        const s = stats[n];
+        const lider = s.vivos === maxVivos && maxVivos > 0;
+        const pct = s.total ? Math.round((s.vivos / s.total) * 100) : 0;
+        return `<button class="lb-row ${n === sel ? "active" : ""}" data-eq="${n}">
+          <div class="eq">
+            <b>Equipo ${n}${lider ? `<span class="lead-tag">va arriba</span>` : ""}</b>
+            <span class="grps">Grupos ${QUINIELA[n].join(" · ")}</span>
+            <div class="bar"><i style="width:${pct}%"></i></div>
+          </div>
+          <div class="score">
+            <div class="big ${lider ? "lead" : ""}">${s.vivos}</div>
+            <div class="lbl">vivos / ${s.total}</div>
+          </div>
+        </button>`;
+      }).join("");
+      lb.hidden = false;
+
+      lb.querySelectorAll(".lb-row").forEach((btn) =>
+        btn.addEventListener("click", () => {
+          sel = Number(btn.dataset.eq);
+          renderLeaderboard();
+        })
+      );
+
+      renderDetalle(sel);
+    }
+
+    // Detalle del participante seleccionado: sus 3 grupos con los equipos.
+    function renderDetalle(n) {
+      let html = `<div class="detail-head"><b>Equipo ${n}</b><span>Grupos ${QUINIELA[n].join(" · ")}</span></div>`;
+      for (const g of QUINIELA[n]) {
+        const filas = ALL.filter((e) => e.grupo === g).sort(porPosicion);
+        if (!filas.length) {
+          html += `<section class="grupo"><div class="grupo-head">
+            <span class="g">Grupo <b>${g}</b></span>
+            <span class="meta">sin datos aún</span></div></section>`;
+          continue;
+        }
+        const vivos = vivosDe(filas);
+        html += `<section class="grupo">
+          <div class="grupo-head">
+            <span class="g">Grupo <b>${g}</b></span>
+            <span class="meta">${vivos}/${filas.length} en pie</span>
+          </div>
+          ${filas.map(buildTeamRow).join("")}
+        </section>`;
+      }
+      board.innerHTML = html;
+    }
+
+    function render() {
+      if (!ALL.length) {
+        lb.hidden = true;
         board.innerHTML = `
           <div class="state">
-            <div class="ball"></div>
+            <div class="ball" style="animation:none"></div>
             <h2>Todavía no hay marcador</h2>
             <p>El bot sincroniza 3 veces al día. En cuanto escriba los equipos, aparecerán aquí.</p>
           </div>`;
         return;
       }
-
-      const alive = equipos.filter((e) => e.status !== "eliminado").length;
-      cntAlive.textContent = alive;
-      cntOut.textContent = equipos.length - alive;
-      tally.hidden = false;
-
-      const porGrupo = {};
-      for (const g of GRUPOS) porGrupo[g] = [];
-      for (const e of equipos) (porGrupo[e.grupo] || (porGrupo[e.grupo] = [])).push(e);
-
-      let html = "";
-      for (const g of GRUPOS) {
-        const filas = (porGrupo[g] || []).sort((a, b) => {
-          const pa = a.posicion ?? 99, pb = b.posicion ?? 99;
-          if (pa !== pb) return pa - pb;
-          return (b.puntos ?? 0) - (a.puntos ?? 0);
-        });
-        if (!filas.length) continue;
-
-        const vivos = filas.filter((t) => t.status !== "eliminado").length;
-        html += `<section class="grupo">
-          <div class="grupo-head">
-            <span class="g">Grupo <b>${g}</b></span>
-            <span class="meta">${vivos}/${filas.length} en pie</span>
-          </div>`;
-
-        for (const t of filas) {
-          const out = t.status === "eliminado";
-          const qualy = !out && (t.posicion === 1 || t.posicion === 2);
-          const gf = t.goles_favor ?? 0, gc = t.goles_contra ?? 0;
-          const dif = (t.diferencia ?? gf - gc);
-          const difTxt = dif > 0 ? `+${dif}` : `${dif}`;
-
-          html += `<div class="team ${out ? "out" : ""} ${qualy ? "qualy" : ""}">
-            <div class="pos">${t.posicion ?? "–"}</div>
-            <div class="who">
-              ${t.logo ? `<img class="crest" src="${t.logo}" alt="" loading="lazy">` : ""}
-              <span class="name">${escapeHtml(t.id || "—")}</span>
-              ${out ? "" : `<i class="live" aria-hidden="true"></i>`}
-            </div>
-            <div class="stats">
-              <div class="goles">${gf}<em>:</em>${gc} <em>·</em> ${difTxt}</div>
-              <div class="pts">${t.puntos ?? 0}<small>pts</small></div>
-            </div>
-            ${out ? `<span class="stamp">Eliminado</span>` : ""}
-          </div>`;
-        }
-        html += `</section>`;
-      }
-      board.innerHTML = html;
-    }
-
-    function escapeHtml(s) {
-      return String(s).replace(/[&<>"']/g, (c) =>
-        ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+      renderLeaderboard();
     }
 
     // ---------- Suscripción en vivo a Firestore ----------
@@ -367,11 +425,12 @@ const firebaseConfig = {
         });
         lastSyncMs = maxTs || Date.now();
         refrescarReloj();
-        render(equipos);
+        ALL = equipos;
+        render();
       },
       (err) => {
         console.error(err);
-        tally.hidden = true;
+        lb.hidden = true;
         board.innerHTML = `
           <div class="state error">
             <div class="ball"></div>
